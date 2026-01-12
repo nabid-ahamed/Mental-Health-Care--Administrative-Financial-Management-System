@@ -1,0 +1,86 @@
+﻿@model IEnumerable<MHC_AFMS.Models.Appointment>
+
+@{
+    ViewData["Title"] = "Billing";
+}
+
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center">
+        <div>
+            <h2 class="text-primary">💰 Generate Invoices</h2>
+            <p class="text-muted">System will automatically apply 40% discount for follow-ups.</p>
+        </div>
+        <a asp-controller="Account" asp-action="StaffDashboard" class="btn btn-secondary">Back to Dashboard</a>
+    </div>
+    <hr />
+
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success">@TempData["Success"]</div>
+    }
+
+    @if (!Model.Any())
+    {
+        <div class="alert alert-info text-center py-5">
+            <h4>No unbilled appointments found.</h4>
+            <p>All completed appointments have been processed.</p>
+        </div>
+    }
+    else
+    {
+        <div class="card shadow-sm">
+            <div class="card-body p-0">
+                <table class="table table-hover table-striped mb-0 align-middle">
+                    <thead class="table-dark">
+                        <tr>
+                            <th>Date</th>
+                            <th>Patient</th>
+                            <th>Doctor</th>
+                            <th>Base Fee</th>
+                            <th>Diagnosis</th>
+                            <th class="text-end">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model)
+                        {
+                            <tr>
+                                <td>@item.AppointmentDate.ToString("MMM dd, yyyy")</td>
+
+                                <td>
+                                    <span class="fw-bold">@item.Patient?.FullName</span><br />
+                                    <small class="text-muted">@item.PatientId.Substring(0, 8)...</small>
+                                </td>
+
+                                <td class="text-primary">Dr. @(item.Doctor?.FullName ?? "Unknown")</td>
+
+                                <td>@item.ConsultationFee.ToString("C")</td>
+
+                                <td>
+                                    @if (!string.IsNullOrEmpty(item.Diagnosis))
+                                    {
+                                        <span>@item.Diagnosis</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="text-muted italic">-</span>
+                                    }
+                                </td>
+
+                                <td class="text-end">
+                                    <form asp-action="GenerateInvoice" method="post">
+                                        <input type="hidden" name="appointmentId" value="@item.Id" />
+
+                                        <button type="submit" class="btn btn-success fw-bold">
+                                            ⚡ Auto-Generate Bill
+                                        </button>
+                                    </form>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    }
+</div>

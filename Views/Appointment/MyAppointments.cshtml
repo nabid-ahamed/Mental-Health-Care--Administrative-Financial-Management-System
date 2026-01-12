@@ -1,0 +1,182 @@
+﻿@model IEnumerable<MHC_AFMS.Models.Appointment>
+
+@{
+    ViewData["Title"] = "My Appointments";
+}
+
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center">
+        <h2>🩺 My Appointment History</h2>
+        <a asp-action="Index" class="btn btn-primary">+ Book New</a>
+    </div>
+    <hr />
+
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success">@TempData["Success"]</div>
+    }
+
+    @if (!Model.Any())
+    {
+        <div class="alert alert-info py-4 text-center">
+            <h4>You have no appointments yet.</h4>
+            <a asp-action="Index" class="btn btn-outline-primary mt-2">Find a Doctor</a>
+        </div>
+    }
+    else
+    {
+        <div class="table-responsive">
+            <table class="table table-hover table-striped align-middle mt-3">
+                <thead class="table-dark">
+                    <tr>
+                        <th>Date</th>
+                        <th>Time Slot</th>
+                        <th>Doctor</th>
+                        <th>Fee</th>
+                        <th>Status</th>
+                        <th>Actions / Report</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model)
+                    {
+                        <tr>
+                            <td>@item.AppointmentDate.ToString("MMM dd, yyyy")</td>
+
+                            <td>
+                                @DateTime.Today.Add(item.StartTime).ToString("h:mm tt") -
+                                @DateTime.Today.Add(item.EndTime).ToString("h:mm tt")
+                            </td>
+
+                            <td class="fw-bold text-primary">Dr. @(item.Doctor?.FullName ?? "Unknown")</td>
+
+                            <td>@item.ConsultationFee.ToString("C")</td>
+
+                            <td>
+                                @if (item.Status == "Pending")
+                                {
+                                    <span class="badge bg-warning text-dark">Pending</span>
+                                }
+                                else if (item.Status == "Approved")
+                                {
+                                    <span class="badge bg-primary">Confirmed</span>
+                                }
+                                else if (item.Status == "Completed")
+                                {
+                                    <span class="badge bg-success">Completed</span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-secondary">@item.Status</span>
+                                }
+                            </td>
+
+                            <td>
+                                @if (item.Status == "Completed")
+                                {
+                                    <button type="button" class="btn btn-sm btn-outline-success" data-bs-toggle="modal" data-bs-target="#rxModal-@item.Id">
+                                        📄 Medical Report
+                                    </button>
+
+                                    <div class="modal fade" id="rxModal-@item.Id" tabindex="-1" aria-labelledby="modalLabel-@item.Id" aria-hidden="true">
+                                        <div class="modal-dialog modal-lg">
+                                            <div class="modal-content">
+                                                <div class="modal-header bg-success text-white">
+                                                    <h5 class="modal-title" id="modalLabel-@item.Id">🩺 Medical Report</h5>
+                                                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                </div>
+                                                <div class="modal-body">
+
+                                                    <div class="mb-3">
+                                                        <h6 class="fw-bold text-primary">Diagnosis:</h6>
+                                                        <p class="border p-2 rounded bg-light">@item.Diagnosis</p>
+                                                    </div>
+
+                                                    <div class="mb-3">
+                                                        <h6 class="fw-bold text-success">💊 Prescription:</h6>
+                                                        <p class="border p-2 rounded bg-light" style="white-space: pre-line">@item.Prescription</p>
+                                                    </div>
+
+                                                    <div class="mb-3">
+                                                        <h6 class="fw-bold text-danger">🔬 Recommended Tests:</h6>
+
+                                                        @if (item.AppointmentTests != null && item.AppointmentTests.Any())
+                                                        {
+                                                            <div class="list-group">
+                                                                @foreach (var testLink in item.AppointmentTests)
+                                                                {
+                                                                    <div class="list-group-item d-flex justify-content-between align-items-center">
+                                                                        <div>
+                                                                            <strong>@testLink.MedicalTest.TestName</strong>
+                                                                            <br />
+                                                                            <small class="text-muted">Fee: @testLink.MedicalTest.Price.ToString("C")</small>
+                                                                        </div>
+
+                                                                        <div>
+                                                                            @if (testLink.Status == "Suggested")
+                                                                            {
+                                                                                <div class="d-flex gap-2">
+                                                                                    <form asp-action="AcceptTest" method="post">
+                                                                                        <input type="hidden" name="id" value="@testLink.Id" />
+                                                                                        <button type="submit" class="btn btn-sm btn-success">✅ Accept</button>
+                                                                                    </form>
+
+                                                                                    <form asp-action="RejectTest" method="post">
+                                                                                        <input type="hidden" name="id" value="@testLink.Id" />
+                                                                                        <button type="submit" class="btn btn-sm btn-outline-danger">❌ Reject</button>
+                                                                                    </form>
+                                                                                </div>
+                                                                            }
+                                                                            else if (testLink.Status == "Accepted")
+                                                                            {
+                                                                                <span class="badge bg-success">Accepted</span>
+                                                                            }
+                                                                            else if (testLink.Status == "Rejected")
+                                                                            {
+                                                                                <span class="badge bg-danger">Rejected</span>
+                                                                            }
+                                                                            else
+                                                                            {
+                                                                                <span class="badge bg-secondary">@testLink.Status</span>
+                                                                            }
+                                                                        </div>
+                                                                    </div>
+                                                                }
+                                                            </div>
+                                                        }
+                                                        else
+                                                        {
+                                                            <p class="text-muted small">No tests required.</p>
+                                                        }
+                                                    </div>
+
+                                                    @if (item.FollowUpDate.HasValue)
+                                                    {
+                                                        <div class="alert alert-warning text-center mt-3">
+                                                            <strong>📅 Next Follow-up:</strong> <br>
+                                                            @item.FollowUpDate.Value.ToString("D")
+                                                        </div>
+                                                    }
+                                                </div>
+                                                <div class="modal-footer">
+                                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                                    <button type="button" onclick="window.print()" class="btn btn-primary">🖨 Print</button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                }
+                                else
+                                {
+                                    <span class="text-muted small">-</span>
+                                }
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+
+    <a asp-controller="Account" asp-action="PatientDashboard" class="btn btn-secondary mt-3">Back to Dashboard</a>
+</div>

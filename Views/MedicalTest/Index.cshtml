@@ -1,0 +1,53 @@
+﻿@model IEnumerable<MHC_AFMS.Models.MedicalTest>
+
+@{
+    ViewData["Title"] = "Medical Test Catalog";
+}
+
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center">
+        <h2>🧪 Medical Test Catalog</h2>
+        <a asp-action="Create" class="btn btn-primary">+ Add New Test</a>
+    </div>
+    <hr />
+
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success">@TempData["Success"]</div>
+    }
+
+    <table class="table table-bordered table-hover">
+        <thead class="table-light">
+            <tr>
+                <th>Test Name</th>
+                <th>Price (Tk.)</th>
+                <th>Status</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td class="fw-bold">@item.TestName</td>
+                    <td>@item.Price.ToString("C")</td>
+                    <td>
+                        @if (item.IsActive)
+                        {
+                            <span class="badge bg-success">Active</span>
+                        }
+                        else
+                        {
+                            <span class="badge bg-secondary">Archived</span>
+                        }
+                    </td>
+                    <td>
+                        <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-outline-primary">✏ Edit</a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+    <a asp-controller="Account" asp-action="AdminDashboard" class="btn btn-secondary">Back to Dashboard</a>
+</div>

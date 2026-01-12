@@ -1,0 +1,50 @@
+﻿@model MHC_AFMS.Controllers.UserViewModel
+
+@{
+    ViewData["Title"] = "Edit Employee";
+}
+
+<div class="container mt-4">
+    <h2>✏ Edit Employee: <span class="text-primary">@Model.FullName</span></h2>
+    <hr />
+
+    <div class="row">
+        <div class="col-md-6">
+            <form asp-action="Edit" method="post">
+                <input type="hidden" asp-for="Id" />
+                <input type="hidden" asp-for="Role" />
+
+                <div class="mb-3">
+                    <label class="form-label">Full Name</label>
+                    <input asp-for="FullName" class="form-control" required />
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Email</label>
+                    <input asp-for="Email" class="form-control" required />
+                </div>
+
+                @if (Model.Role == "Doctor")
+                {
+                    <div class="p-3 mb-3 bg-light border rounded">
+                        <h5 class="text-info">🩺 Doctor Details</h5>
+
+                        <div class="mb-3">
+                            <label class="form-label">Specialization</label>
+                            <input asp-for="Specialization" class="form-control" />
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Consultation Fee (Tk.)</label>
+                            <input asp-for="ConsultationFee" type="number" class="form-control" />
+                            <small class="text-muted">Changing this will apply to NEW bookings only.</small>
+                        </div>
+                    </div>
+                }
+
+                <button type="submit" class="btn btn-warning">💾 Save Changes</button>
+                <a asp-action="Index" class="btn btn-secondary">Cancel</a>
+            </form>
+        </div>
+    </div>
+</div>

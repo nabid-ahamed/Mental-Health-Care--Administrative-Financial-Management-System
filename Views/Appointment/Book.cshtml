@@ -1,0 +1,116 @@
+﻿@model IEnumerable<MHC_AFMS.Helpers.AppointmentSlot>
+
+@{
+    ViewData["Title"] = "Book Appointment";
+    var selectedDate = (DateTime)ViewBag.SelectedDate;
+    var minDate = DateTime.Today.ToString("yyyy-MM-dd");
+
+    // 🟢 FIX: Safely get the Doctor ID from the Doctor Object
+    // If ViewBag.Doctor is null, we default to empty string (though it shouldn't happen here)
+    var doctorId = ViewBag.Doctor?.Id ?? "";
+}
+
+<div class="container mt-4">
+    <div class="card shadow-sm">
+        <div class="card-body p-4">
+
+            <div class="d-flex justify-content-between align-items-center mb-4 pb-3 border-bottom">
+                <div>
+                    <h4 class="mb-1">📅 Book an Appointment</h4>
+                    <p class="text-muted mb-0">With <strong class="text-primary">Dr. @(ViewBag.Doctor?.FullName ?? "Doctor")</strong></p>
+                </div>
+
+                <form method="get" action="@Url.Action("Book")" class="d-flex gap-2 align-items-center">
+                    <input type="hidden" name="doctorId" value="@doctorId" />
+
+                    <label class="fw-bold text-nowrap">Change Date:</label>
+                    <input type="date"
+                           name="date"
+                           class="form-control"
+                           value="@selectedDate.ToString("yyyy-MM-dd")"
+                           min="@minDate"
+                           onchange="this.form.submit()" />
+                </form>
+            </div>
+
+            <form asp-action="ConfirmBooking" method="post">
+
+                <input type="hidden" name="doctorId" value="@doctorId" />
+                <input type="hidden" name="date" value="@selectedDate" />
+
+                <div class="mb-4">
+                    <label class="form-label fw-bold">Step 1: Select a Time Slot</label>
+                    <div class="d-flex flex-wrap gap-2">
+                        @{
+                            var bookedList = ViewBag.BookedTimes as List<TimeSpan> ?? new List<TimeSpan>();
+                        }
+
+                        @if (Model != null && Model.Any())
+                        {
+                            foreach (var slot in Model)
+                            {
+                                var timeVal = slot.Time;
+                                var timeText = DateTime.Today.Add(timeVal).ToString("h:mm tt");
+                                var uniqueId = "slot_" + timeVal.TotalMinutes;
+
+                                bool isBooked = bookedList.Contains(timeVal);
+
+                                if (isBooked)
+                                {
+                                    // 🔴 BOOKED SLOT STYLE:
+                                    // 1. btn-outline-secondary: Keeps the outline style (like the others) but grey
+                                    // 2. text-decoration-line-through: Adds the cross mark on text
+                                    // 3. opacity-50: Fades it out
+                                    <input type="radio" class="btn-check" disabled>
+                                    <label class="btn btn-outline-secondary text-decoration-line-through opacity-50"
+                                           style="cursor: not-allowed;"
+                                           title="Already Booked">
+                                        @timeText
+                                    </label>
+                                }
+                                else
+                                {
+                                    // 🟢 AVAILABLE SLOT STYLE:
+                                    <input type="radio"
+                                           class="btn-check"
+                                           name="startTime"
+                                           id="@uniqueId"
+                                           value="@timeVal"
+                                           required>
+
+                                    <label class="btn btn-outline-primary" for="@uniqueId">
+                                        @timeText
+                                    </label>
+                                }
+                            }
+                        }
+                        else
+                        {
+                            <div class="alert alert-warning w-100">
+                                No slots available for this date.
+                            </div>
+                        }
+                    </div>
+                </div>
+
+                <div class="mb-4">
+                    <label for="description" class="form-label fw-bold">Reason for Visit:</label>
+                    <textarea name="description"
+                              id="description"
+                              class="form-control"
+                              rows="3"
+                              placeholder="Describe your symptoms or reason for booking..."
+                              required></textarea>
+                </div>
+
+                <div class="d-grid gap-2">
+                    <button type="submit" class="btn btn-success btn-lg">
+                        Confirm Booking
+                    </button>
+                    <a asp-controller="Appointment" asp-action="Index" class="btn btn-light">Cancel</a>
+                </div>
+
+            </form>
+        </div>
+    </div>
+</div>

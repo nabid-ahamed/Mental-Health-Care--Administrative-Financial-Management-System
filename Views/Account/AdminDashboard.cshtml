@@ -1,0 +1,96 @@
+﻿@using Microsoft.AspNetCore.Identity
+@using MHC_AFMS.Models
+
+@inject UserManager<ApplicationUser> UserManager
+
+@{
+    ViewData["Title"] = "Admin Dashboard";
+
+    // 🟢 FETCH USER DATA
+    var user = await UserManager.GetUserAsync(User);
+    string fullName = user?.FullName ?? User.Identity?.Name;
+}
+
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="display-6">🛡 Admin Dashboard</h1>
+            <p class="text-muted">Welcome, <strong>@fullName</strong></p>
+        </div>
+
+        <div>
+            <span class="badge bg-success p-2">System Online</span>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-4 mb-4">
+            <div class="card shadow-sm h-100 border-start border-4 border-primary">
+                <div class="card-body">
+                    <h5 class="card-title text-primary">👥 HR & Staff</h5>
+                    <p class="card-text text-muted">Hire doctors, assign schedules, and manage staff accounts.</p>
+                    <div class="d-grid gap-2">
+                        <a asp-controller="Admin" asp-action="Index" class="btn btn-outline-primary">
+                            Manage Employees
+                        </a>
+                        <a asp-controller="Admin" asp-action="Create" class="btn btn-sm btn-light">
+                            + Hire New Staff
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4 mb-4">
+            <div class="card shadow-sm h-100 border-start border-4 border-success">
+                <div class="card-body">
+                    <h5 class="card-title text-success">📅 Appointments</h5>
+                    <p class="card-text text-muted">View upcoming bookings, approve requests, or cancel visits.</p>
+                    <div class="d-grid gap-2">
+                        <a asp-controller="Appointment" asp-action="ManageAppointments" class="btn btn-outline-success">
+                            View All Bookings
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4 mb-4">
+            <div class="card shadow-sm h-100 border-start border-4 border-warning">
+                <div class="card-body">
+                    <h5 class="card-title text-warning">💰 Finance & Tests</h5>
+                    <p class="card-text text-muted">Manage the medical test catalog, prices, and billing settings.</p>
+                    <div class="d-grid gap-2">
+                        <a asp-controller="MedicalTest" asp-action="Index" class="btn btn-outline-warning text-dark">
+                            Manage Test Catalog
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4 mb-4">
+            <div class="card shadow-sm h-100 border-start border-4 border-success">
+                <div class="card-body text-center">
+                    <h5 class="card-title text-warning">📈 Financial Analytics</h5>
+                    <p class="card-text text-muted">View revenue reports, doctor performance, and lab income.</p>
+                    <a asp-controller="Financial" asp-action="Dashboard" class="btn btn-outline-warning w-100 text-dark fw-bold">
+                        View Reports
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4 mb-4">
+            <div class="card shadow-sm h-100 border-start border-4 border-success">
+                <div class="card-body">
+                    <h5 class="card-title text-success"> ⚙️ My Profile</h5>
+                    <p class="card-text text-muted">View profile details, or update details.</p>
+                    <div class="d-grid gap-2">
+                        <a asp-controller="Account" asp-action="Profile" class="btn btn-outline-primary"> Edit Profile</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

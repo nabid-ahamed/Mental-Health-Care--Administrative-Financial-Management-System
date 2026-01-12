@@ -1,0 +1,106 @@
+﻿@model MHC_AFMS.Controllers.AccountController.ProfileViewModel
+
+@{
+    ViewData["Title"] = "My Profile";
+}
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white">
+                    <h3 class="mb-0">👤 My Profile Settings</h3>
+                </div>
+                <div class="card-body">
+
+                    @if (TempData["Success"] != null)
+                    {
+                        <div class="alert alert-success">@TempData["Success"]</div>
+                    }
+                    @if (TempData["Error"] != null)
+                    {
+                        <div class="alert alert-danger">@TempData["Error"]</div>
+                    }
+
+                    <form asp-action="UpdateProfile" method="post">
+                        <h5 class="text-secondary mb-3">Personal Information</h5>
+
+                        <div class="mb-3">
+                            <label class="form-label">Full Name</label>
+                            <input asp-for="FullName" class="form-control" required />
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Age</label>
+                                <input asp-for="Age" type="number" class="form-control" min="1" max="120" placeholder="Years" />
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Gender</label>
+                                <select asp-for="Gender" class="form-select">
+                                    <option value="">-- Select Gender --</option>
+                                    <option value="Male">Male</option>
+                                    <option value="Female">Female</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Contact Number</label>
+                            <input asp-for="ContactNumber" class="form-control" placeholder="+880 1xxx-xxxxxx" />
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Address</label>
+                            <textarea asp-for="Address" class="form-control" rows="2" placeholder="House #, Road #, City"></textarea>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Email Address <span class="badge bg-secondary">Read-Only</span></label>
+                            <input asp-for="Email" type="email" class="form-control bg-light" readonly />
+                            <small class="text-muted">Contact Admin to change your email.</small>
+                        </div>
+
+                        <hr class="my-4" />
+
+                        <h5 class="text-secondary mb-3">Security (Change Password)</h5>
+                        <div class="alert alert-light border">
+                            <small class="text-muted">Leave blank to keep current password.</small>
+                            <div class="row mt-2">
+                                <div class="col-md-6 mb-2">
+                                    <label class="form-label">Current Password</label>
+                                    <input asp-for="CurrentPassword" type="password" class="form-control" placeholder="Required if changing pass" />
+                                </div>
+                                <div class="col-md-6 mb-2">
+                                    <label class="form-label">New Password</label>
+                                    <input asp-for="NewPassword" type="password" class="form-control" placeholder="Enter new password" />
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-success btn-lg">💾 Save Changes</button>
+
+                            @if (User.IsInRole("Admin"))
+                            {
+                                <a asp-action="AdminDashboard" class="btn btn-secondary">Back to Dashboard</a>
+                            }
+                            else if (User.IsInRole("Doctor"))
+                            {
+                                <a asp-controller="Account" asp-action="DoctorDashboard" class="btn btn-secondary">Back to Dashboard</a>
+                            }
+                            else if (User.IsInRole("Patient"))
+                            {
+                                <a asp-controller="Account" asp-action="PatientDashboard" class="btn btn-secondary">Back to Dashboard</a>
+                            }
+                            else
+                            {
+                                <a asp-controller="Account" asp-action="StaffDashboard" class="btn btn-secondary">Back to Dashboard</a>
+                            }
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

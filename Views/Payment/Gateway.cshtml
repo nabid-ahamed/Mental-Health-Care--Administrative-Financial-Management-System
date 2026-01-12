@@ -1,0 +1,263 @@
+﻿@model MHC_AFMS.Models.ViewModels.PaymentGatewayViewModel
+
+@{
+    ViewData["Title"] = "Secure Payment";
+}
+
+<style>
+    /* 🟢 MFS GRID LAYOUT */
+    .mfs-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr); /* 3 columns */
+        gap: 15px;
+        margin-bottom: 20px;
+    }
+
+    /* The clickable label container */
+    .mfs-option {
+        cursor: pointer;
+        position: relative;
+        margin: 0;
+    }
+
+        /* Hide the actual radio circle */
+        .mfs-option input[type="radio"] {
+            position: absolute;
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+    /* The visual box */
+    .mfs-card {
+        border: 2px solid #eee;
+        border-radius: 12px;
+        height: 80px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: white;
+        transition: all 0.2s ease;
+        padding: 10px;
+    }
+
+    /* Image styling */
+    .mfs-logo {
+        max-width: 100%;
+        max-height: 50px;
+        object-fit: contain;
+    }
+
+    /* Hover State */
+    .mfs-option:hover .mfs-card {
+        border-color: #0d6efd;
+        background-color: #f8f9fa;
+        transform: translateY(-2px);
+    }
+
+    /* Selected State (The magic part) */
+    .mfs-option input[type="radio"]:checked + .mfs-card {
+        border-color: #0d6efd;
+        background-color: #e7f1ff;
+        box-shadow: 0 0 0 3px rgba(13, 110, 253, 0.2);
+    }
+</style>
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-7">
+            <div class="card shadow-lg border-0" style="border-radius: 15px; overflow: hidden;">
+
+                <div class="card-header bg-primary text-white text-center py-4">
+                    <h4 class="mb-0 fw-bold">🔒 Secure Payment Gateway</h4>
+                    <p class="mb-0 small opacity-75">Invoice #@Model.InvoiceId</p>
+                </div>
+
+                <div class="card-body p-4 p-md-5">
+
+                    <div class="text-center mb-5">
+                        <small class="text-uppercase text-muted fw-bold tracking-wide">Total Payable</small>
+                        <h1 class="text-success fw-bold display-4">@Model.Amount.ToString("C")</h1>
+                    </div>
+
+                    <ul class="nav nav-pills nav-fill mb-4 p-1 bg-light rounded-pill" role="tablist">
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link active rounded-pill fw-bold" id="tab-card" data-bs-toggle="pill" data-bs-target="#content-card" type="button" onclick="switchMethod('Card')">
+                                💳 Card Payment
+                            </button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link rounded-pill fw-bold" id="tab-mfs" data-bs-toggle="pill" data-bs-target="#content-mfs" type="button" onclick="switchMethod('MFS')">
+                                📱 Mobile Banking
+                            </button>
+                        </li>
+                    </ul>
+
+                    <form asp-action="ProcessPayment" method="post" id="paymentForm">
+                        <input type="hidden" asp-for="InvoiceId" />
+                        <input type="hidden" asp-for="Amount" />
+                        <input type="hidden" id="finalPaymentMethod" name="PaymentMethod" value="Card" />
+
+                        <div class="tab-content">
+
+                            <div class="tab-pane fade show active" id="content-card">
+                                <div class="mb-3">
+                                    <label class="form-label text-muted small fw-bold">CARD NUMBER</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text bg-white"><i class="bi bi-credit-card"></i></span>
+                                        <input type="text" class="form-control card-input" placeholder="0000 0000 0000 0000" maxlength="19" required />
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-6 mb-3">
+                                        <label class="form-label text-muted small fw-bold">EXPIRY</label>
+                                        <input type="text" class="form-control card-input" placeholder="MM/YY" maxlength="5" required />
+                                    </div>
+                                    <div class="col-6 mb-3">
+                                        <label class="form-label text-muted small fw-bold">CVV</label>
+                                        <input type="password" class="form-control card-input" placeholder="123" maxlength="3" required />
+                                    </div>
+                                </div>
+                                <div class="mb-4">
+                                    <label class="form-label text-muted small fw-bold">CARD HOLDER</label>
+                                    <input type="text" class="form-control card-input" placeholder="NAME ON CARD" required />
+                                </div>
+                                <button type="submit" class="btn btn-primary w-100 py-3 fw-bold rounded-3 shadow-sm">
+                                    Pay @Model.Amount.ToString("C") via Card
+                                </button>
+                            </div>
+
+                            <div class="tab-pane fade" id="content-mfs">
+
+                                <p class="mb-3 fw-bold text-muted">Select Wallet:</p>
+
+                                <div class="mfs-grid">
+                                    <label class="mfs-option">
+                                        <input type="radio" name="mfsSelector" value="bKash" checked onclick="selectWallet('bKash')">
+                                        <div class="mfs-card">
+                                            <img src="~/images/bkash.png" class="mfs-logo" alt="bKash" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';" />
+                                            <span style="display:none; color:#d12053; font-weight:bold;">bKash</span>
+                                        </div>
+                                    </label>
+
+                                    <label class="mfs-option">
+                                        <input type="radio" name="mfsSelector" value="Nagad" onclick="selectWallet('Nagad')">
+                                        <div class="mfs-card">
+                                            <img src="~/images/nagad.png" class="mfs-logo" alt="Nagad" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';" />
+                                            <span style="display:none; color:#f6921e; font-weight:bold;">Nagad</span>
+                                        </div>
+                                    </label>
+
+                                    <label class="mfs-option">
+                                        <input type="radio" name="mfsSelector" value="Rocket" onclick="selectWallet('Rocket')">
+                                        <div class="mfs-card">
+                                            <img src="~/images/rocket.png" class="mfs-logo" alt="Rocket" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';" />
+                                            <span style="display:none; color:#8c3494; font-weight:bold;">Rocket</span>
+                                        </div>
+                                    </label>
+
+                                    <label class="mfs-option">
+                                        <input type="radio" name="mfsSelector" value="Upay" onclick="selectWallet('Upay')">
+                                        <div class="mfs-card">
+                                            <img src="~/images/upay.png" class="mfs-logo" alt="Upay" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';" />
+                                            <span style="display:none; color:#0083ca; font-weight:bold;">Upay</span>
+                                        </div>
+                                    </label>
+
+                                    <label class="mfs-option">
+                                        <input type="radio" name="mfsSelector" value="Cellfin" onclick="selectWallet('Cellfin')">
+                                        <div class="mfs-card">
+                                            <img src="~/images/cellfin.png" class="mfs-logo" alt="Cellfin" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';" />
+                                            <span style="display:none; color:#28a745; font-weight:bold;">Cellfin</span>
+                                        </div>
+                                    </label>
+
+                                    <label class="mfs-option">
+                                        <input type="radio" name="mfsSelector" value="Cashbaba" onclick="selectWallet('Cashbaba')">
+                                        <div class="mfs-card">
+                                            <img src="~/images/cashbaba.png" class="mfs-logo" alt="Cashbaba" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';" />
+                                            <span style="display:none; color:#ff5722; font-weight:bold;">Cashbaba</span>
+                                        </div>
+                                    </label>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="form-label text-muted small fw-bold">MOBILE NUMBER</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text bg-white">🇧🇩 +880</span>
+                                        <input type="text" class="form-control mfs-input" placeholder="17xxxxxxxx" maxlength="11" />
+                                    </div>
+                                </div>
+                                <div class="mb-4">
+                                    <label class="form-label text-muted small fw-bold">PIN</label>
+                                    <input type="password" class="form-control mfs-input" placeholder="Enter 5-digit PIN" maxlength="5" />
+                                </div>
+
+                                <button type="submit" class="btn btn-danger w-100 py-3 fw-bold rounded-3 shadow-sm" id="mfsSubmitBtn">
+                                    Pay with bKash
+                                </button>
+                            </div>
+
+                        </div>
+                    </form>
+                </div>
+
+                <div class="card-footer bg-light text-center py-3">
+                    <small class="text-muted"><i class="bi bi-shield-lock-fill"></i> Payments are processed securely via SSL encryption.</small>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // 🟢 1. Toggle Logic to Fix "Button Not Working"
+    function switchMethod(method) {
+        if(method === 'Card') {
+            // Set method name for Controller
+            document.getElementById('finalPaymentMethod').value = 'Card';
+
+            // Enable validation for CARD inputs
+            document.querySelectorAll('.card-input').forEach(input => input.setAttribute('required', 'true'));
+
+            // Disable validation for MFS inputs (This fixes the bug!)
+            document.querySelectorAll('.mfs-input').forEach(input => input.removeAttribute('required'));
+        }
+        else {
+            // Set method to currently selected MFS
+            let selectedWallet = document.querySelector('input[name="mfsSelector"]:checked').value;
+            document.getElementById('finalPaymentMethod').value = selectedWallet;
+
+            // Enable validation for MFS inputs
+            document.querySelectorAll('.mfs-input').forEach(input => input.setAttribute('required', 'true'));
+
+            // Disable validation for CARD inputs
+            document.querySelectorAll('.card-input').forEach(input => input.removeAttribute('required'));
+        }
+    }
+
+    // 🟢 2. Logic to Handle Grid Selection
+    function selectWallet(walletName) {
+        // Update hidden input
+        document.getElementById('finalPaymentMethod').value = walletName;
+
+        // Update Button Text
+        let btn = document.getElementById('mfsSubmitBtn');
+        btn.innerText = "Pay with " + walletName;
+
+        // Dynamic Button Colors
+        btn.className = "btn w-100 py-3 fw-bold rounded-3 shadow-sm"; // reset base classes
+
+        if (walletName === 'bKash') btn.classList.add('btn-danger'); // Red
+        else if (walletName === 'Nagad') btn.classList.add('btn-warning'); // Orange
+        else if (walletName === 'Rocket') btn.classList.add('btn-info', 'text-white'); // Purple
+        else if (walletName === 'Cellfin') btn.classList.add('btn-success'); // Green
+        else if (walletName === 'Upay') btn.classList.add('btn-primary'); // Blue
+        else btn.classList.add('btn-dark'); // Cashbaba/Other
+    }
+
+    // Initialize (Ensure Card is default)
+    window.onload = function() {
+        switchMethod('Card');
+    };
+</script>

@@ -1,0 +1,35 @@
+﻿@model MHC_AFMS.Models.MedicalTest
+
+@{
+    ViewData["Title"] = "Add Test";
+}
+
+<div class="container mt-4">
+    <h2>🧪 Add New Medical Test</h2>
+    <hr />
+    <div class="row">
+        <div class="col-md-6">
+            <form asp-action="Create">
+                <div class="mb-3">
+                    <label asp-for="TestName" class="form-label">Test Name</label>
+                    <input asp-for="TestName" class="form-control" placeholder="e.g. MRI Scan" required />
+                    <span asp-validation-for="TestName" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="Price" class="form-label">Price (Tk.)</label>
+                    <input asp-for="Price" type="number" class="form-control" placeholder="0.00" required />
+                    <span asp-validation-for="Price" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3 form-check">
+                    <input class="form-check-input" asp-for="IsActive" checked />
+                    <label class="form-check-label">Available for booking?</label>
+                </div>
+
+                <button type="submit" class="btn btn-success">Save to Catalog</button>
+                <a asp-action="Index" class="btn btn-secondary">Cancel</a>
+            </form>
+        </div>
+    </div>
+</div>

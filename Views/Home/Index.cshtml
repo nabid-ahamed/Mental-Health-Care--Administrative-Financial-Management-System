@@ -1,0 +1,168 @@
+﻿@using Microsoft.AspNetCore.Identity
+@using MHC_AFMS.Models
+
+@inject UserManager<ApplicationUser> UserManager
+
+@{
+    ViewData["Title"] = "Welcome";
+
+    // 2. FETCH CURRENT USER DATA
+    ApplicationUser? currentUser = null;
+    if (User.Identity.IsAuthenticated)
+    {
+        currentUser = await UserManager.GetUserAsync(User);
+    }
+}
+
+<div class="p-5 mb-4 bg-white rounded-3 shadow-sm border">
+    <div class="container-fluid py-4">
+        <div class="row align-items-center">
+
+            <div class="col-md-6">
+                <h1 class="display-4 fw-bold text-primary">🏥 Welcome to MHC - AFMS</h1>
+                <p class="col-md-11 fs-5 text-muted">
+                    Advanced healthcare management at your fingertips. Book appointments, view lab reports, and manage bills securely from home.
+                </p>
+                <div class="mt-4">
+                    @if (!User.Identity.IsAuthenticated)
+                    {
+                        <a asp-controller="Account" asp-action="Login" class="btn btn-primary btn-lg px-4 gap-3 shadow-sm">
+                            <i class="bi bi-box-arrow-in-right"></i> Login to Portal
+                        </a>
+                        <a asp-controller="Account" asp-action="Register" class="btn btn-outline-secondary btn-lg px-4 shadow-sm">
+                            📝 New Patient?
+                        </a>
+                    }
+                    else
+                    {
+                        <p class="text-success fw-bold mb-2">
+                            <i class="bi bi-check-circle-fill"></i> Welcome back, @(currentUser?.FullName ?? User.Identity.Name)!
+                        </p>
+
+                        @if (User.IsInRole("Admin"))
+                        {
+                            <a asp-controller="Account" asp-action="AdminDashboard" class="btn btn-primary btn-lg shadow-sm">Go to Admin Panel</a>
+                        }
+                        else if (User.IsInRole("Doctor"))
+                        {
+                            <a asp-controller="Account" asp-action="DoctorDashboard" class="btn btn-primary btn-lg shadow-sm">Doctor Dashboard</a>
+                        }
+                        else if (User.IsInRole("Staff"))
+                        {
+                            <a asp-controller="Account" asp-action="StaffDashboard" class="btn btn-primary btn-lg shadow-sm">Staff Portal</a>
+                        }
+                        else
+                        {
+                            <a asp-controller="Account" asp-action="PatientDashboard" class="btn btn-primary btn-lg shadow-sm">My Dashboard</a>
+                        }
+                    }
+                </div>
+            </div>
+
+            <div class="col-md-6 d-none d-md-block">
+                <div id="heroCarousel" class="carousel slide carousel-fade shadow rounded-3 overflow-hidden" data-bs-ride="carousel">
+
+                    <div class="carousel-indicators">
+                        <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="0" class="active"></button>
+                        <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="1"></button>
+                        <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="2"></button>
+                        <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="3"></button>
+                        <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="4"></button>
+                    </div>
+
+                    <div class="carousel-inner">
+                        <div class="carousel-item active" data-bs-interval="3500">
+                            <img src="~/images/slide0.png" class="d-block w-100" alt="Hospital Slide 1" style="height: 400px; object-fit: cover;">
+                            <div class="carousel-caption d-none d-md-block bg-dark bg-opacity-50 rounded p-2">
+                                <h5>Book Appointments</h5>
+                                <p class="small mb-0">Instant appointment booking — everything in one secure place.</p>
+                            </div>
+                        </div>
+
+                        <div class="carousel-item" data-bs-interval="3500">
+                            <img src="~/images/slide2.png" class="d-block w-100" alt="Hospital Slide 1" style="height: 400px; object-fit: cover;">
+                            <div class="carousel-caption d-none d-md-block bg-dark bg-opacity-50 rounded p-2">
+                                <h5>Expert Doctors</h5>
+                                <p class="small mb-0">Top specialists available 24/7.</p>
+                            </div>
+                        </div>
+
+                        <div class="carousel-item" data-bs-interval="3500">
+                            <img src="~/images/slide1.png" class="d-block w-100" alt="Hospital Slide 2" style="height: 400px; object-fit: cover;">
+                            <div class="carousel-caption d-none d-md-block bg-dark bg-opacity-50 rounded p-2">
+                                <h5>Modern Facilities</h5>
+                                <p class="small mb-0">State-of-the-art medical equipment.</p>
+                            </div>
+                        </div>
+
+                        <div class="carousel-item" data-bs-interval="3500">
+                            <img src="~/images/slide3.png" class="d-block w-100" alt="Hospital Slide 3" style="height: 400px; object-fit: cover;">
+                            <div class="carousel-caption d-none d-md-block bg-dark bg-opacity-50 rounded p-2">
+                                <h5>Digital Lab Reports</h5>
+                                <p class="small mb-0">Get your test results online instantly.</p>
+                            </div>
+                        </div>
+
+                        <div class="carousel-item" data-bs-interval="3500">
+                            <img src="~/images/slide4.png" class="d-block w-100" alt="Hospital Slide 1" style="height: 400px; object-fit: cover;">
+                            <div class="carousel-caption d-none d-md-block bg-dark bg-opacity-50 rounded p-2">
+                                <h5>Pay with Confidence</h5>
+                                <p class="small mb-0">Transparent billing — No surprises, no stress..</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <button class="carousel-control-prev" type="button" data-bs-target="#heroCarousel" data-bs-slide="prev">
+                        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                        <span class="visually-hidden">Previous</span>
+                    </button>
+                    <button class="carousel-control-next" type="button" data-bs-target="#heroCarousel" data-bs-slide="next">
+                        <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                        <span class="visually-hidden">Next</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row align-items-md-stretch">
+
+    <div class="col-md-4 mb-4">
+        <div class="h-100 p-4 bg-white border rounded-3 shadow-sm feature-card">
+            <div class="text-primary mb-3">
+                <i class="bi bi-calendar-check display-5"></i>
+            </div>
+            <h3>Easy Booking</h3>
+            <p>Find specialized doctors, view their schedules, and book appointments instantly without waiting in line.</p>
+        </div>
+    </div>
+
+    <div class="col-md-4 mb-4">
+        <div class="h-100 p-4 bg-white border rounded-3 shadow-sm feature-card">
+            <div class="text-success mb-3">
+                <i class="bi bi-file-earmark-medical display-5"></i>
+            </div>
+            <h3>Digital Lab Reports</h3>
+            <p>Access your test results online as soon as they are ready. No need to visit the hospital just to collect reports.</p>
+        </div>
+    </div>
+
+    <div class="col-md-4 mb-4">
+        <div class="h-100 p-4 bg-white border rounded-3 shadow-sm feature-card">
+            <div class="text-warning mb-3">
+                <i class="bi bi-credit-card-2-front display-5"></i>
+            </div>
+            <h3>Secure Billing</h3>
+            <p>View invoices and pay securely using Credit Cards or Mobile Banking (bKash, Nagad) directly from your dashboard.</p>
+        </div>
+    </div>
+</div>
+
+<div class="alert alert-primary d-flex align-items-center mt-3 shadow-sm" role="alert">
+    <i class="bi bi-info-circle-fill fs-3 me-3"></i>
+    <div>
+        <strong>Need Help?</strong> For any emergency or immediate ambulance service, dial
+        <span class="fs-5 fw-bold ms-1">10655</span> (24/7)
+    </div>
+</div>

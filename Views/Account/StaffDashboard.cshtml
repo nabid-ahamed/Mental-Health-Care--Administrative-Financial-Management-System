@@ -1,0 +1,69 @@
+﻿@using Microsoft.AspNetCore.Identity
+@using MHC_AFMS.Models
+
+@inject UserManager<ApplicationUser> UserManager
+
+@{
+    ViewData["Title"] = "Staff Dashboard";
+
+    // 🟢 FETCH USER DATA
+    var user = await UserManager.GetUserAsync(User);
+    string fullName = user?.FullName ?? User.Identity?.Name;
+}
+
+<div class="container mt-5">
+    <div class="card shadow">
+        <div class="card-body text-center bg-light">
+            <h1 class="display-4 text-success">🏥 Staff Portal</h1>
+            <p class="lead">Welcome, <strong>@fullName</strong></p>
+            <hr />
+
+            <div class="row justify-content-center mt-4">
+
+                <div class="col-md-5 mb-4">
+                    <div class="card text-white bg-dark h-100">
+                        <div class="card-body">
+                            <h4 class="card-title">📅 Appointments</h4>
+                            <p class="card-text">View pending requests, approve or cancel bookings.</p>
+                            <a asp-controller="Appointment" asp-action="ManageAppointments" class="btn btn-primary btn-lg w-100">Manage Appointments</a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-5 mb-4">
+                    <div class="card text-white bg-success h-100">
+                        <div class="card-body">
+                            <h4 class="card-title">💵 Billing & Invoices</h4>
+                            <p class="card-text">Create invoices and process patient payments.</p>
+                            <a asp-controller="Payment" asp-action="UnbilledAppointments" class="btn btn-light btn-lg w-100 text-success fw-bold">Manage Billing</a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-5 mb-4">
+                    <div class="card text-white bg-info h-100">
+                        <div class="card-body">
+                            <h4 class="card-title">🧪 Lab Management</h4>
+                            <p class="card-text">Process tests and manage the catalog.</p>
+
+                            <a asp-controller="Appointment" asp-action="ManageLabTests" class="btn btn-light btn-lg w-100 text-info fw-bold mb-2">Open Lab Queue</a>
+
+                            <a asp-controller="MedicalTest" asp-action="Index" class="btn btn-outline-light w-100 fw-bold">⚙️ Edit Test Catalog</a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-5 mb-4">
+                    <div class="card text-white bg-secondary h-100">
+                        <div class="card-body">
+                            <h4 class="card-title">👤 My Profile</h4>
+                            <p class="card-text">View and update your profile details.</p>
+                            <a asp-controller="Account" asp-action="Profile" class="btn btn-light btn-lg w-100">Edit Your Profile</a>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>

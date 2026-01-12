@@ -1,0 +1,117 @@
+﻿@model IEnumerable<MHC_AFMS.Models.DoctorSchedule>
+
+@{
+    ViewData["Title"] = "Manage Doctor Schedule";
+    var doctorId = ViewBag.DoctorId;
+
+    // 🇧🇩 BANGLADESH CONTEXT: Week starts Saturday
+    var dayOrder = new List<string> { "Saturday", "Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday" };
+}
+
+<div class="container mt-4">
+    <h2>📅 Manage Schedule: <span class="text-primary">@ViewBag.DoctorName</span></h2>
+    <p class="text-muted">Clinic Rules: 9:00 AM - 10:00 PM (Irregular times not allowed).</p>
+    <hr />
+
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger">@TempData["Error"]</div>
+    }
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success">@TempData["Success"]</div>
+    }
+
+    <div class="row">
+        <div class="col-md-5">
+            <div class="card shadow-sm">
+                <div class="card-header bg-dark text-white">Assign New Shift</div>
+                <div class="card-body">
+                    <form asp-action="SaveSchedule" method="post">
+                        <input type="hidden" name="doctorId" value="@doctorId" />
+
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">1. Select Days</label><br />
+                            @foreach (var day in dayOrder)
+                            {
+                                <div class="form-check form-check-inline">
+                                    <input class="form-check-input" type="checkbox" name="selectedDays" value="@day">
+                                    <label class="form-check-label">@day.Substring(0, 3)</label>
+                                </div>
+                            }
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col">
+                                <label class="form-label fw-bold">2. Start Time</label>
+                                <select name="startHour" class="form-select">
+                                    @for (int i = 9; i < 22; i++)
+                                    {
+                                        int displayHour = (i > 12) ? i - 12 : i;
+                                        string ampm = (i >= 12) ? "PM" : "AM";
+                                        <option value="@i">@displayHour:00 @ampm</option>
+                                    }
+                                </select>
+                            </div>
+                            <div class="col">
+                                <label class="form-label fw-bold">3. End Time</label>
+                                <select name="endHour" class="form-select">
+                                    @for (int i = 10; i <= 22; i++)
+                                    {
+                                        int displayHour = (i > 12) ? i - 12 : i;
+                                        string ampm = (i >= 12) ? "PM" : "AM";
+                                        <option value="@i">@displayHour:00 @ampm</option>
+                                    }
+                                </select>
+                            </div>
+                        </div>
+
+                        <button type="submit" class="btn btn-success w-100">Assign Schedule</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-7">
+            <div class="card">
+                <div class="card-header">Current Weekly Schedule</div>
+                <div class="card-body">
+                    @if (!Model.Any())
+                    {
+                        <p class="text-muted text-center py-4">No schedule assigned yet.<br />Select days on the left to begin.</p>
+                    }
+                    else
+                    {
+                        <table class="table table-striped table-bordered">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Day</th>
+                                    <th>Working Hours</th>
+                                    <th>Duration</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var item in Model.OrderBy(m => dayOrder.IndexOf(m.DayOfWeek)))
+                                {
+                                    <tr>
+                                        <td class="fw-bold">@item.DayOfWeek</td>
+                                        <td>
+                                            @((item.StartHour > 12) ? (item.StartHour - 12) + " PM" : item.StartHour + " AM")
+                                            -
+                                            @((item.EndHour > 12) ? (item.EndHour - 12) + " PM" : item.EndHour + " AM")
+                                        </td>
+                                        <td>@(item.EndHour - item.StartHour) Hours</td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="mt-3">
+        <a asp-action="Index" class="btn btn-secondary">Back to Staff List</a>
+    </div>
+</div>

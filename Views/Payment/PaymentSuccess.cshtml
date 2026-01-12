@@ -1,0 +1,27 @@
+﻿@model int
+
+@{
+    ViewData["Title"] = "Payment Success";
+}
+
+<div class="container text-center mt-5">
+    <div class="card shadow-sm mx-auto p-5 border-success" style="max-width: 500px;">
+
+        <div class="display-1 text-success mb-3">
+            <i class="bi bi-check-circle-fill"></i> ✅
+        </div>
+
+        <h2 class="text-success fw-bold">Payment Successful!</h2>
+        <p class="lead text-muted">Thank you for your payment.</p>
+
+        <div class="alert alert-light border mt-3">
+            <strong>Invoice #@Model</strong> has been cleared.
+        </div>
+
+        <hr />
+
+        <a asp-controller="Payment" asp-action="MyBills" class="btn btn-primary w-100">
+            Back to My Bills
+        </a>
+    </div>
+</div>

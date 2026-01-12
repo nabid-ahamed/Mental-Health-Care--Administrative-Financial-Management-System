@@ -1,0 +1,38 @@
+﻿@model MHC_AFMS.Models.MedicalTest
+
+@{
+    ViewData["Title"] = "Edit Test";
+}
+
+<div class="container mt-4">
+    <h2>Edit Test Details</h2>
+    <hr />
+    <div class="row">
+        <div class="col-md-6">
+            <form asp-action="Edit">
+                <input type="hidden" asp-for="Id" />
+
+                <div class="mb-3">
+                    <label asp-for="TestName" class="form-label">Test Name</label>
+                    <input asp-for="TestName" class="form-control" />
+                    <span asp-validation-for="TestName" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="Price" class="form-label">Price (Tk.)</label>
+                    <input asp-for="Price" type="number" class="form-control" />
+                    <span asp-validation-for="Price" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3 form-check">
+                    <input class="form-check-input" asp-for="IsActive" />
+                    <label class="form-check-label">Is Active?</label>
+                    <small class="text-muted d-block">Uncheck this to hide the test from billing instead of deleting it.</small>
+                </div>
+
+                <button type="submit" class="btn btn-primary">Update Test</button>
+                <a asp-action="Index" class="btn btn-secondary">Cancel</a>
+            </form>
+        </div>
+    </div>
+</div>

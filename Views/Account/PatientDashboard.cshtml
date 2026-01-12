@@ -1,0 +1,66 @@
+﻿@using Microsoft.AspNetCore.Identity
+@using MHC_AFMS.Models
+
+@inject UserManager<ApplicationUser> UserManager
+
+@{
+    ViewData["Title"] = "Patient Dashboard";
+
+    // 2. FETCH USER DATA
+    var user = await UserManager.GetUserAsync(User);
+    string fullName = user?.FullName ?? User.Identity?.Name;
+}
+
+<div class="container mt-5">
+    <div class="card shadow-sm">
+        <div class="card-body text-center">
+            <h1 class="display-4 text-primary">👋 Welcome, @fullName!</h1>
+            <p class="lead">Manage your health and appointments easily.</p>
+            <hr />
+
+            <div class="row mt-4 justify-content-center">
+
+                <div class="col-md-4 mb-4">
+                    <div class="card text-white bg-primary h-100">
+                        <div class="card-body">
+                            <h5 class="card-title">📅 Book Appointment</h5>
+                            <p class="card-text">Schedule a visit with one of our specialists.</p>
+                            <a asp-controller="Appointment" asp-action="Book" class="btn btn-light w-100">Book Now</a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-4 mb-4">
+                    <div class="card text-white bg-success h-100">
+                        <div class="card-body">
+                            <h5 class="card-title">📂 My History</h5>
+                            <p class="card-text">View your past and upcoming appointments.</p>
+                            <a asp-controller="Appointment" asp-action="MyAppointments" class="btn btn-light w-100">View History</a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-4 mb-4">
+                    <div class="card text-white bg-warning h-100">
+                        <div class="card-body">
+                            <h5 class="card-title">💳 Payments</h5>
+                            <p class="card-text">Check pending invoices and billing history.</p>
+                            <a asp-controller="Payment" asp-action="MyBills" class="btn btn-light text-dark w-100">View Invoices</a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-4 mb-4">
+                    <div class="card text-white bg-secondary h-100">
+                        <div class="card-body">
+                            <h5 class="card-title">👤 My Profile</h5>
+                            <p class="card-text">View and update profile.</p>
+                            <a asp-controller="Account" asp-action="Profile" class="btn btn-light w-100">Edit Profile</a>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>

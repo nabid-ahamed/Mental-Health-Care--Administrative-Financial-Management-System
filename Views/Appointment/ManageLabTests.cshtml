@@ -1,0 +1,70 @@
+﻿@model IEnumerable<MHC_AFMS.Models.AppointmentTest>
+
+@{
+    ViewData["Title"] = "Lab Management";
+}
+
+<div class="container mt-4">
+    <h2 class="text-info">🧪 Lab Test Queue</h2>
+    <p class="text-muted">Mark tests as completed to add them to the patient's bill.</p>
+    <hr />
+
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success">@TempData["Success"]</div>
+    }
+    @if (TempData["Warning"] != null)
+    {
+        <div class="alert alert-warning">@TempData["Warning"]</div>
+    }
+
+    @if (!Model.Any())
+    {
+        <div class="alert alert-secondary text-center py-5">
+            <h4>No pending lab tests found.</h4>
+            <p>All accepted tests have been processed.</p>
+        </div>
+    }
+    else
+    {
+        <div class="card shadow-sm">
+            <div class="card-body p-0">
+                <table class="table table-striped align-middle mb-0">
+                    <thead class="table-dark">
+                        <tr>
+                            <th>Patient</th>
+                            <th>Test Name</th>
+                            <th>Cost</th>
+                            <th>Status</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model)
+                        {
+                            <tr>
+                                <td>
+                                    <strong>@item.Appointment.Patient.FullName</strong><br />
+                                    <small class="text-muted">ID: @item.Appointment.PatientId.Substring(0, 8)...</small>
+                                </td>
+                                <td>@item.MedicalTest.TestName</td>
+                                <td>@item.MedicalTest.Price.ToString("C")</td>
+                                <td><span class="badge bg-primary">Accepted</span></td>
+                                <td>
+                                    <form asp-action="MarkTestCompleted" method="post">
+                                        <input type="hidden" name="id" value="@item.Id" />
+                                        <button type="submit" class="btn btn-sm btn-success fw-bold">
+                                            ✅ Mark Completed & Bill
+                                        </button>
+                                    </form>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    }
+
+    <a asp-controller="Account" asp-action="StaffDashboard" class="btn btn-secondary mt-3">Back to Dashboard</a>
+</div>

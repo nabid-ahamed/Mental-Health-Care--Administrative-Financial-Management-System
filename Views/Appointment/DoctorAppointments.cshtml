@@ -1,0 +1,101 @@
+﻿@model IEnumerable<MHC_AFMS.Models.Appointment>
+
+@{
+    ViewData["Title"] = "Doctor's Schedule";
+}
+
+<div class="container mt-4">
+    <h2 class="text-info">🩺 Today's Patients</h2>
+    <hr />
+
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success">@TempData["Success"]</div>
+    }
+
+    <div class="row">
+        @foreach (var item in Model)
+        {
+            <div class="col-md-12 mb-3">
+                <div class="card shadow-sm">
+                    <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center">
+                        <span>
+                            <i class="bi bi-clock"></i> <strong>Time:</strong> @item.StartTime.ToString(@"hh\:mm") - @item.EndTime.ToString(@"hh\:mm")
+                        </span>
+                        <span>
+                            <strong>Date:</strong> @item.AppointmentDate.ToString("MMM dd, yyyy")
+                        </span>
+                        <span class="badge bg-warning text-dark">
+                            Patient: @(item.Patient?.FullName ?? "Unknown")
+                        </span>
+                    </div>
+
+                    <div class="card-body">
+                        <h5 class="card-title text-primary">Patient Complaint:</h5>
+                        <p class="card-text border p-2 bg-light rounded">@item.Description</p>
+                        <hr />
+
+                        <form asp-action="SubmitDiagnosis" method="post">
+                            <input type="hidden" name="id" value="@item.Id" />
+
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label class="fw-bold">Diagnosis <span class="text-danger">*</span></label>
+                                    <textarea name="diagnosis" class="form-control" rows="3" required placeholder="What is the condition?"></textarea>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="fw-bold">Prescription (Rx) <span class="text-danger">*</span></label>
+                                    <textarea name="prescription" class="form-control" rows="3" required placeholder="Medicine Name & Dosage"></textarea>
+                                </div>
+
+                                <div class="col-md-12 mb-3">
+                                    <label class="fw-bold mb-2">Suggested Tests <span class="text-muted small">(Check all that apply)</span></label>
+
+                                    <div class="card p-2" style="max-height: 150px; overflow-y: auto;">
+                                        @if (ViewBag.TestList != null)
+                                        {
+                                            foreach (var test in ViewBag.TestList)
+                                            {
+                                                <div class="form-check">
+                                                    <input class="form-check-input" type="checkbox" name="recommendedTestIds" value="@test.Id" id="test_@test.Id">
+
+                                                    <label class="form-check-label" for="test_@test.Id">
+                                                        @test.TestName - <span class="text-success fw-bold">@test.Price.ToString("C")</span>
+                                                    </label>
+                                                </div>
+                                            }
+                                        }
+                                        else
+                                        {
+                                            <div class="text-muted small">No tests available in catalog.</div>
+                                        }
+                                    </div>
+                                    <div class="form-text">If no test is needed, leave unchecked.</div>
+                                </div>
+
+                                <div class="col-md-6 mb-3">
+                                    <label class="fw-bold">Follow-up Date (Optional)</label>
+                                    <input type="date" name="followUpDate" class="form-control" min="@DateTime.Today.ToString("yyyy-MM-dd")" />
+                                </div>
+                            </div>
+
+                            <button type="submit" class="btn btn-success mt-2 w-100 fw-bold">
+                                ✅ Complete Treatment & Send Report
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        }
+
+        @if (!Model.Any())
+        {
+            <div class="alert alert-secondary text-center w-100 py-4">
+                <h4>No pending appointments for today.</h4>
+                <p>Good job, Doctor! You are all caught up.</p>
+            </div>
+        }
+    </div>
+
+    <a asp-controller="Account" asp-action="DoctorDashboard" class="btn btn-secondary mt-3">Back to Dashboard</a>
+</div>

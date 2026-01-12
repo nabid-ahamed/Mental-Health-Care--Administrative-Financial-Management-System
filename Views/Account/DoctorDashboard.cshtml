@@ -1,0 +1,46 @@
+﻿@using Microsoft.AspNetCore.Identity
+@using MHC_AFMS.Models
+
+@inject UserManager<ApplicationUser> UserManager
+
+@{
+    ViewData["Title"] = "Doctor Dashboard";
+
+    // 2. FETCH USER DATA
+    var user = await UserManager.GetUserAsync(User);
+    string fullName = user?.FullName ?? User.Identity?.Name;
+}
+
+<div class="container mt-5">
+    <div class="card shadow">
+        <div class="card-body text-center bg-light">
+            <h1 class="display-4 text-info">🩺 Doctor's Portal</h1>
+            <p class="lead">Welcome, <strong>@fullName</strong></p>
+            <hr />
+
+            <div class="row justify-content-center mt-4">
+
+                <div class="col-md-5 mb-4">
+                    <div class="card text-white bg-primary h-100">
+                        <div class="card-body">
+                            <h3 class="card-title">📋 My Patients</h3>
+                            <p class="card-text">View today's schedule and treat patients.</p>
+                            <a asp-controller="Appointment" asp-action="DoctorAppointments" class="btn btn-light btn-lg w-100">Start Consultations</a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-5 mb-4">
+                    <div class="card text-white bg-secondary h-100">
+                        <div class="card-body">
+                            <h3 class="card-title">👤 My Profile</h3>
+                            <p class="card-text">View and update your profile details.</p>
+                            <a asp-controller="Account" asp-action="Profile" class="btn btn-light btn-lg w-100">Edit Profile</a>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
